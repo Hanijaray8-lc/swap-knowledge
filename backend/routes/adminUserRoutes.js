@@ -10,7 +10,9 @@ const {
   getAdminUserById,
   registerAdminUser,
   getStaffBySubject,
-  getAllSubjects
+  getAllSubjects,
+   getAllStaffRequests,
+  updateStaffRequestStatus,
 } = require('../controllers/adminUserController');
 
 router.get('/subjects', getAllSubjects);
@@ -18,7 +20,11 @@ router.get('/staff-by-subject/:subject', getStaffBySubject);
 
 router.get('/admins/:id', authMiddleware, getAdminUserById);
 router.get('/admins', getAllAdminUsers);
+// ✅ Get all staff requests for admin dashboard
+router.get('/requests', getAllStaffRequests);
 
+// ✅ Update staff request status (Approve / Reject)
+router.put('/requests/:id', updateStaffRequestStatus);
 router.post('/register', registerAdminUser);
 
 router.get('/staff/:id', async (req, res) => {
@@ -106,6 +112,33 @@ router.post('/submit-request', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// SEND REQUEST TO ADMIN
+router.post('/send-request/:id', async (req, res) => {
+  try {
+    const { id } = req.params; // admin ID
+    const { message, adminName, adminDepartment } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ error: 'Request message is required' });
+    }
+
+    // You can store this in a separate collection if needed (like an "AdminRequest" model)
+    // For now, we’ll just log or simulate storing
+    console.log(`Request sent to admin: ${adminName} (${adminDepartment})`);
+    console.log(`Message: ${message}`);
+
+    // Optionally, save to MongoDB (you can create AdminRequest model if needed)
+    // const newRequest = new AdminRequest({ adminId: id, adminName, adminDepartment, message });
+    // await newRequest.save();
+
+    res.status(200).json({ message: 'Request sent successfully to admin!' });
+  } catch (error) {
+    console.error('Error sending request:', error);
+    res.status(500).json({ error: 'Server error while sending request' });
+  }
+});
+
 router.get('/pending-requests-count', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
@@ -211,3 +244,5 @@ router.get('/staff', async (req, res) => {
   }
 });
 module.exports = router;
+
+

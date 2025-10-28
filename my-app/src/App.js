@@ -36,12 +36,15 @@ import StudentViewPage from './components/StudentViewPage';
 import LoginFormm from './components/LoginFormm';
 import UserDataTable from './components/UserDataTable';
 import ManagerLogin from "./components/ManagerLogin";
+import ApprovalPage from "./components/ApprovalPage";
+import StaffDetailsPage from './components/StaffDetailsPage';
 
 const App = () => {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<HomePage />} />
+            <Route path="/admin/approvals" element={<ApprovalPage />} />
             <Route path="/login/:userType" element={<LoginFormm />} />
 <Route path="/student-details" element={<UserDataTable />} />   
      <Route path="/register" element={<RegistrationForm />} />
@@ -77,6 +80,7 @@ const App = () => {
                  <Route path="/student-post" element={<StudentPostPage />} />
                    <Route path="/manager" element={<ManagerLogin />} />
        <Route path="/my-posts" element={<StudentMyPosts />} />
+         <Route path="/staff-details" element={<StaffDetailsPage />} />
       </Routes>
 
     </Router>

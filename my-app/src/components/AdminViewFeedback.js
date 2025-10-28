@@ -11,10 +11,10 @@ import {
   Alert,
   Stack,
   TextField,
+  IconButton,
   MenuItem,
 } from '@mui/material';
 import FeedbackIcon from '@mui/icons-material/Feedback';
-
 const AdminViewFeedback = () => {
   const [feedbackList, setFeedbackList] = useState([]);
   const [filteredFeedback, setFilteredFeedback] = useState([]);
@@ -23,7 +23,6 @@ const AdminViewFeedback = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-
   useEffect(() => {
     const fetchFeedback = async () => {
       try {
@@ -68,12 +67,10 @@ const AdminViewFeedback = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-        <FeedbackIcon sx={{ mr: 1 }} />
-        Student Feedbacks
-      </Typography>
-
+   <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        
+</Box>
       {/* Staff Filter */}
       <Box sx={{ mb: 3 }}>
         <TextField

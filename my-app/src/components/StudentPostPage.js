@@ -32,12 +32,47 @@ export default function StudentPostPage() {
     name: studentName,
   });
 
+  const [filePreview, setFilePreview] = useState({
+    file: null,
+    image: null
+  });
+
+  // Supported image formats
+  const supportedImageFormats = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
+  const maxFileSize = 5 * 1024 * 1024; // 5MB
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (files) {
-      setFormData({ ...formData, [name]: files[0] });
+    
+    if (files && files[0]) {
+      const file = files[0];
+      
+      // File size validation
+      if (file.size > maxFileSize) {
+        setError("File size should be less than 5MB");
+        return;
+      }
+
+      // Image format validation
+      if (name === "image" && !supportedImageFormats.includes(file.type)) {
+        setError("Please upload a valid image file (JPEG, PNG, GIF, WebP)");
+        return;
+      }
+
+      setFormData(prev => ({ ...prev, [name]: file }));
+      
+      // Create preview for image
+      if (name === "image") {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setFilePreview(prev => ({ ...prev, image: e.target.result }));
+        };
+        reader.readAsDataURL(file);
+      }
+      
+      setError(""); // Clear any previous errors
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
@@ -45,21 +80,32 @@ export default function StudentPostPage() {
     setLoading(true);
     setError("");
 
-    if (!formData.topic) {
+    // Validation
+    if (!formData.topic.trim()) {
       setError("Topic is required");
       setLoading(false);
       return;
     }
-    if (!formData.content) {
+    if (!formData.content.trim()) {
       setError("Content is required");
+      setLoading(false);
+      return;
+    }
+    if (formData.topic.trim().length < 3) {
+      setError("Topic should be at least 3 characters long");
+      setLoading(false);
+      return;
+    }
+    if (formData.content.trim().length < 10) {
+      setError("Content should be at least 10 characters long");
       setLoading(false);
       return;
     }
 
     try {
       const formDataToSend = new FormData();
-      Object.entries(formData).forEach(([key, val]) => {
-        if (val) formDataToSend.append(key, val);
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value) formDataToSend.append(key, value);
       });
 
       await axios.post("https://swap-knowledge.onrender.com/api/posts", formDataToSend, {
@@ -69,14 +115,17 @@ export default function StudentPostPage() {
       setSuccess(true);
       setTimeout(() => navigate("/social-feed"), 2000);
     } catch (err) {
-      setError("Failed to create post. Try again.");
+      setError(err.response?.data?.message || "Failed to create post. Try again.");
     } finally {
       setLoading(false);
     }
   };
 
   const removeFile = (fieldName) => {
-    setFormData({ ...formData, [fieldName]: null });
+    setFormData(prev => ({ ...prev, [fieldName]: null }));
+    if (fieldName === "image") {
+      setFilePreview(prev => ({ ...prev, image: null }));
+    }
   };
 
   const handleCloseSnackbar = () => {
@@ -135,9 +184,14 @@ export default function StudentPostPage() {
             fullWidth
             sx={{ mb: 3 }}
             placeholder="Enter your post topic..."
+            error={formData.topic && formData.topic.length < 3}
+            helperText={
+              formData.topic && formData.topic.length < 3
+                ? "Topic should be at least 3 characters"
+                : ""
+            }
           />
 
-          {/* Content */}
           <TextField
             label="Content"
             name="content"
@@ -148,34 +202,92 @@ export default function StudentPostPage() {
             rows={4}
             sx={{ mb: 3 }}
             placeholder="Write your post..."
+            error={formData.content && formData.content.length < 10}
+            helperText={
+              formData.content && formData.content.length < 10
+                ? "Content should be at least 10 characters"
+                : ""
+            }
           />
 
+          {/* File Upload Section */}
           <Box sx={{ mb: 3 }}>
-            <Button variant="contained" component="label" fullWidth>
-              Upload File / PDF
-              <input type="file" name="file" hidden onChange={handleChange} />
+            <Button 
+              variant="contained" 
+              component="label" 
+              fullWidth
+              sx={{ mb: 1 }}
+            >
+              📄 Upload File / PDF
+              <input 
+                type="file" 
+                name="file" 
+                hidden 
+                onChange={handleChange}
+                accept=".pdf,.doc,.docx,.txt"
+              />
             </Button>
             {formData.file && (
               <Chip
                 label={formData.file.name}
                 onDelete={() => removeFile("file")}
-                sx={{ mt: 2 }}
+                variant="outlined"
+                sx={{ mt: 1 }}
               />
             )}
+            <Typography variant="caption" color="text.secondary">
+              Supported: PDF, DOC, DOCX, TXT (Max 5MB)
+            </Typography>
           </Box>
 
+          {/* Image Upload Section */}
           <Box sx={{ mb: 3 }}>
-            <Button variant="outlined" component="label" fullWidth>
-              Upload Image
-              <input type="file" name="image" hidden onChange={handleChange} />
-            </Button>
-            {formData.image && (
-              <Chip
-                label={formData.image.name}
-                onDelete={() => removeFile("image")}
-                sx={{ mt: 2 }}
+            <Button 
+              variant="outlined" 
+              component="label" 
+              fullWidth
+              sx={{ mb: 1 }}
+            >
+              🖼️ Upload Image
+              <input 
+                type="file" 
+                name="image" 
+                hidden 
+                onChange={handleChange}
+                accept="image/*"
               />
+            </Button>
+            
+            {formData.image && (
+              <Box sx={{ mt: 2 }}>
+                <Chip
+                  label={formData.image.name}
+                  onDelete={() => removeFile("image")}
+                  variant="outlined"
+                  sx={{ mb: 1 }}
+                />
+                {filePreview.image && (
+                  <Box sx={{ mt: 1 }}>
+                    <Typography variant="caption" display="block" sx={{ mb: 1 }}>
+                      Image Preview:
+                    </Typography>
+                    <img 
+                      src={filePreview.image} 
+                      alt="Preview" 
+                      style={{ 
+                        maxWidth: "100%", 
+                        maxHeight: "200px", 
+                        borderRadius: "8px",
+                        border: "1px solid #ddd"
+                      }} 
+                    />
+                  </Box>
+                )}
+              </Box>
             )}
+            <Typography variant="caption" color="text.secondary">
+              Supported: JPG, PNG, GIF, WebP (Max 5MB)
+            </Typography>
           </Box>
 
           <Button
@@ -188,6 +300,9 @@ export default function StudentPostPage() {
               py: 1.5,
               fontSize: "1rem",
               background: "linear-gradient(45deg,#7b1fa2,#512da8)",
+              "&:hover": {
+                background: "linear-gradient(45deg,#6a1b9a,#4527a0)",
+              }
             }}
           >
             {loading ? (
@@ -208,3 +323,4 @@ export default function StudentPostPage() {
     </Box>
   );
 }
+

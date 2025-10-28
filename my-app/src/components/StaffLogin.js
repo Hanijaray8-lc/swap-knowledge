@@ -52,8 +52,17 @@ const StaffLogin = () => {
         }
       );
 
+      // ✅ CORRECTED: Store staff information in localStorage
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('loggedInUser', JSON.stringify(response.data.user));
+      localStorage.setItem('staffName', response.data.user.fullName); // ✅ Add this
+      localStorage.setItem('staffId', response.data.user._id); // ✅ Add this
+      localStorage.setItem('userType', 'staff'); // ✅ Add this
+
+      console.log('🔑 Staff login successful:', {
+        staffName: response.data.user.fullName,
+        staffId: response.data.user._id
+      });
 
       alert(`Login successful! Welcome, ${response.data.user.fullName}`);
       navigate('/admin');
@@ -225,7 +234,6 @@ const StaffLogin = () => {
             />
 
             <Grid container justifyContent="space-between" sx={{ mb: 2 }}>
-             
               <Link 
                 href="#" 
                 variant="body2" 
@@ -380,3 +388,5 @@ const StaffLogin = () => {
 };
 
 export default StaffLogin;
+
+

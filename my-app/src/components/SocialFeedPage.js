@@ -10,6 +10,7 @@ import ShareIcon from "@mui/icons-material/Share";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
+
 const timeAgo = (dateString) => {
   if (!dateString) return ""; 
   const now = new Date();
@@ -311,14 +312,19 @@ export default function SocialDashboard() {
           justifyContent: "space-between",
           px: { xs: 2, sm: 3 }
         }}>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <img src="/images/swap.jpg" alt="Slothit Logo"
-              style={{
-                height: "40px",
-                borderRadius: "4px",
-                width: "120px"
-              }} />
-          </Box>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+ 
+  <img
+    src="/images/swap.jpg"
+    alt="Slothit Logo"
+    style={{
+      height: "40px",
+      borderRadius: "4px",
+      width: "120px"
+    }}
+  />
+</Box>
+
           <TextField
             variant="outlined"
             placeholder="Search slothit"

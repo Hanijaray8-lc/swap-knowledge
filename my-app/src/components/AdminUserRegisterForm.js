@@ -17,6 +17,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const genders = ["Male", "Female", "Other"];
 
@@ -78,7 +79,9 @@ const AdminUserRegisterForm = () => {
       alert(err.response?.data?.error || 'Registration failed. Please try again.');
     }
   };
-
+  const handleBackToDashboard = () => {
+    navigate('/admin'); 
+  };
   return (
     <Box
       sx={{
@@ -90,6 +93,24 @@ const AdminUserRegisterForm = () => {
         py: 4
       }}
     >
+        {/* Back to Dashboard Button - Top Left */}
+      <Button 
+        startIcon={<ArrowBackIcon />} 
+        onClick={handleBackToDashboard}
+        sx={{
+          position: 'absolute',
+          top: 20,
+          left: 20,
+          color: '#4A69E0',
+          fontWeight: 'bold',
+          '&:hover': { 
+            backgroundColor: 'rgba(74,105,224,0.08)' 
+          }
+        }}
+      >
+        Back to Dashboard
+      </Button>
+
       <Box sx={{ width: '100%', maxWidth: 700 }}>
         <Box
           sx={{

@@ -9,6 +9,8 @@ const swapKnowledgeRoutes = require("./routes/swapKnowledgeRoutes");
 const messageRoutes = require('./routes/messageRoutes');
 const postRoutes = require("./routes/postRoutes");
 const { sendMessage } = require('./controllers/messageController');
+const followRoutes = require('./routes/followRoutes');
+const permissionRoutes = require('./routes/permissionRoutes');
 
 
 dotenv.config();
@@ -19,7 +21,8 @@ app.use(express.json());
 
 app.post('/api/messages/send', sendMessage);
 app.use('/api/messages', messageRoutes);
-
+app.use('/api/permissions', permissionRoutes);
+app.use('/api/follow', followRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const storage = multer.diskStorage({

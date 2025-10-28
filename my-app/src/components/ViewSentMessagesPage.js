@@ -7,15 +7,19 @@ import {
   CardContent,
   Divider,
   Link,
-  Button
+  Button,
+  IconButton
 } from '@mui/material';
 import MessageIcon from '@mui/icons-material/Message';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import LinkIcon from '@mui/icons-material/Link';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useNavigate } from 'react-router-dom';
 
 const StudentMessagesPage = () => {
   const [messages, setMessages] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem('staffMessages')) || [];
@@ -24,9 +28,23 @@ const StudentMessagesPage = () => {
 
   return (
     <Box sx={{ p: 4, backgroundColor: '#F5F7FA', minHeight: '100vh' }}>
-      <Typography variant="h5" fontWeight="bold" gutterBottom>
-        Messages from Students
-      </Typography>
+      {/* 🔙 Back to Dashboard Arrow */}
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <IconButton
+          onClick={() => navigate('/admin')}
+          sx={{
+            color: '#1976d2',
+            '&:hover': { color: '#0d47a1' },
+            mr: 1
+          }}
+        >
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant="h5" fontWeight="bold">
+          Messages from Students
+        </Typography>
+      </Box>
+
       <Divider sx={{ mb: 3 }} />
 
       {messages.length === 0 ? (

@@ -1,4 +1,5 @@
 const AdminUser = require('../models/AdminUser');
+const StaffRequest = require('../models/StaffRequest');
 
 const getAllAdminUsers = async (req, res) => {
   try {
@@ -54,10 +55,48 @@ const getAllSubjects = async (req, res) => {
   }
 };
 
+// ✅ Get all staff requests (for AdminUserDashboard)
+const getAllStaffRequests = async (req, res) => {
+  try {
+    const requests = await StaffRequest.find().sort({ createdAt: -1 });
+    res.status(200).json(requests);
+  } catch (error) {
+    console.error('Error fetching staff requests:', error);
+    res.status(500).json({ message: 'Server error fetching requests' });
+  }
+};
+// ✅ Update staff request status (Approve / Reject)
+const updateStaffRequestStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const request = await StaffRequest.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+
+    if (!request) {
+      return res.status(404).json({ message: 'Request not found' });
+    }
+
+    res.status(200).json(request);
+  } catch (error) {
+    console.error('Error updating request status:', error);
+    res.status(500).json({ message: 'Server error updating request' });
+  }
+};
 module.exports = {
   getAllAdminUsers,
   getAdminUserById,
   registerAdminUser,
   getStaffBySubject,
-  getAllSubjects
+  getAllSubjects,
+    getAllStaffRequests,
+  updateStaffRequestStatus
 };
+
+
+
+

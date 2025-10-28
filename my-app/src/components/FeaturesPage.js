@@ -23,7 +23,9 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
-  CircularProgress
+  CircularProgress,
+  Chip,
+  Stack
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import PostAddIcon from '@mui/icons-material/PostAdd';
@@ -34,6 +36,11 @@ import ChatIcon from '@mui/icons-material/Chat';
 import FeedIcon from '@mui/icons-material/Feed';
 import CloseIcon from '@mui/icons-material/Close';
 import PersonIcon from '@mui/icons-material/Person';
+import SchoolIcon from '@mui/icons-material/School';
+import WorkIcon from '@mui/icons-material/Work';
+import PeopleIcon from '@mui/icons-material/People';
+import EmailIcon from '@mui/icons-material/Email';
+import WcIcon from '@mui/icons-material/Wc';
 import { useNavigate } from 'react-router-dom';
 
 export default function FeaturesPage() {
@@ -151,14 +158,24 @@ export default function FeaturesPage() {
     }
   };
 
-  const handleNavigateToStaffProfile = (staffId, staffName) => {
-    navigate(`/admin/view/${staffId}`, {
+  const handleNavigateToStaffProfile = (staff) => {
+    // Navigate to staff details page with ONLY allowed information
+    navigate('/staff-details', {
       state: {
-        staffName: staffName,
-        staffId: staffId
+        staff: {
+          // Only these fields are visible to students
+          fullName: staff.fullName,
+          followers: staff.followers || 0,
+          email: staff.email,
+          gender: staff.gender,
+          department: staff.department,
+          staffPost: staff.staffPost,
+          // Hide sensitive information like phone, address, salary, etc.
+        }
       }
     });
     setShowSearchResults(false);
+    setSearchQuery('');
   };
 
   const features = [
@@ -223,7 +240,7 @@ export default function FeaturesPage() {
             >
               {!isMobile && (
                 <Typography variant="body2" sx={{ fontSize: '0.8rem', mr: 0.5 }}>
-                staffviewMassage
+                  Messages
                 </Typography>
               )}
               <DashboardIcon fontSize={isMobile ? "small" : "medium"} />
@@ -235,7 +252,7 @@ export default function FeaturesPage() {
             >
               {!isMobile && (
                 <Typography variant="body2" sx={{ fontSize: '0.8rem', mr: 0.5 }}>
-                 viewFeedback
+                  View Feedback
                 </Typography>
               )}
               <ChatIcon fontSize={isMobile ? "small" : "medium"} />
@@ -442,6 +459,7 @@ export default function FeaturesPage() {
             </Button>
           </Paper>
 
+          {/* Search Results Dialog */}
           <Dialog 
             open={showSearchResults} 
             onClose={() => setShowSearchResults(false)}
@@ -474,12 +492,14 @@ export default function FeaturesPage() {
                       <ListItem 
                         key={staff._id}
                         button
-                        onClick={() => handleNavigateToStaffProfile(staff._id, staff.fullName)}
+                        onClick={() => handleNavigateToStaffProfile(staff)}
                         sx={{
                           mb: 1,
                           borderRadius: 2,
+                          border: '1px solid #e0e0e0',
                           '&:hover': {
-                            backgroundColor: '#f5f5f5'
+                            backgroundColor: '#f5f5f5',
+                            borderColor: '#1e2a78'
                           }
                         }}
                       >
@@ -489,16 +509,47 @@ export default function FeaturesPage() {
                           </Avatar>
                         </ListItemAvatar>
                         <ListItemText
-                          primary={staff.fullName}
+                          primary={
+                            <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1e2a78' }}>
+                              {staff.fullName}
+                            </Typography>
+                          }
                           secondary={
-                            <React.Fragment>
-                              <Typography variant="body2" color="textSecondary">
-                                {staff.department}
-                              </Typography>
-                              <Typography variant="body2" color="textSecondary">
+                            <Box sx={{ mt: 1 }}>
+                              <Stack direction="row" spacing={1} sx={{ mb: 1 }} flexWrap="wrap" gap={0.5}>
+                                <Chip 
+                                  icon={<SchoolIcon />} 
+                                  label={staff.department} 
+                                  size="small" 
+                                  variant="outlined"
+                                  color="primary"
+                                />
+                                <Chip 
+                                  icon={<WorkIcon />} 
+                                  label={staff.staffPost} 
+                                  size="small" 
+                                  variant="outlined"
+                                />
+                                {staff.followers && (
+                                  <Chip 
+                                    icon={<PeopleIcon />} 
+                                    label={`${staff.followers} followers`} 
+                                    size="small" 
+                                    color="secondary"
+                                  />
+                                )}
+                              </Stack>
+                              <Typography variant="body2" color="textSecondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <EmailIcon fontSize="small" />
                                 {staff.email}
                               </Typography>
-                            </React.Fragment>
+                              {staff.gender && (
+                                <Typography variant="body2" color="textSecondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+                                  <WcIcon fontSize="small" />
+                                  {staff.gender}
+                                </Typography>
+                              )}
+                            </Box>
                           }
                         />
                       </ListItem>
@@ -514,6 +565,11 @@ export default function FeaturesPage() {
                 </Box>
               )}
             </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setShowSearchResults(false)}>
+                Close
+              </Button>
+            </DialogActions>
           </Dialog>
 
           <Grid container spacing={4} justifyContent="center">
@@ -546,3 +602,4 @@ export default function FeaturesPage() {
     </>
   );
 }
+
